@@ -29,7 +29,9 @@ Begin each message with `{{user}}:` or `{{char}}:`. Put `<START>` on its own lin
 
 Token counts are estimates. SillyTavern JSONL logs can be imported too: choose the messages to keep, then import them as an example. System messages and log metadata are excluded.
 
-🎭 Want to give your SillyTavern chats a visual novel feel? Check out [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library gallery](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
+## 🎭 ImmersiveGroups
+
+Want to give your SillyTavern chats a visual novel feel? Check out [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
 
 ## Privacy and saving
 
