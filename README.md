@@ -4,11 +4,11 @@ A standalone HTML editor for SillyTavern example conversations. Import, edit, an
 
 ![Example Builder preview](docs/preview-1.0.png)
 
-[Open the app on GitHub Pages](https://lunarfyre-st.github.io/Editor-for-SillyTavern-Chat-Examples/)
-
-[Download releases](https://github.com/Lunarfyre-ST/Editor-for-SillyTavern-Chat-Examples/releases)
+## [Open the app on GitHub Pages](https://lunarfyre-st.github.io/Editor-for-SillyTavern-Chat-Examples/)
 
 You can also download `ST-ExampleBuilder-1.0.html` and open it directly in a modern browser; no installation or server is required.
+
+[Download releases](https://github.com/Lunarfyre-ST/Editor-for-SillyTavern-Chat-Examples/releases)
 
 ## Using the editor
 
