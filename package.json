@@ -1,0 +1,11 @@
+{
+  "name": "st-examplebuilder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/browser.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

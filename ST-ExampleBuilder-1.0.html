@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>ST-ExampleBuilder 1.0</title>
+<style>
+:root {
+  color-scheme: dark;
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  color: #f2edf5;
+  background: #100d14;
+  --panel: #1b1521;
+  --field: #241c2c;
+  --border: #4a3858;
+  --muted: #b5a4bf;
+  --accent: #ce9af4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(1100px, 100%); margin: auto; padding: 32px 18px 100px; }
+h1 { font: 500 2.4rem Georgia, serif; margin: 4px 0 20px; }
+h2 { margin: 0 0 16px; }
+small, .muted { color: var(--muted); font-size: .875rem; }
+button, select, input, textarea { font: inherit; }
+button, select, input, textarea {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--field);
+  color: inherit;
+  padding: 9px 12px;
+}
+button { cursor: pointer; }
+button:hover { background: #392a45; }
+button:disabled { opacity: .4; cursor: default; }
+button, select { min-height: 40px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.primary {
+  background: #bf82e9;
+  color: #211228;
+  border-color: #d7a8f7;
+  font-weight: 750;
+}
+.primary:hover { background: #d29df6; }
+.toolbar, .actions, .meta, .footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.toolbar { margin-bottom: 12px; }
+.toolbar .spacer { flex: 1; }
+.stats { color: var(--muted); font-size: .875rem; line-height: 1.7; }
+.card {
+  border: 1px solid #3c2e48;
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 14px;
+  overflow-anchor: none;
+}
+.card.active { border-color: #9165ad; }
+.card.start { background: #2b1d37; }
+.message-head, .start-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.message-head select { color: var(--accent); font-family: monospace; }
+.message-head .actions { margin-left: auto; }
+.start-head { margin: 0; }
+.start-head code { color: var(--accent); font-weight: 750; }
+.start-head input { flex: 1; min-width: 150px; background: #211829; }
+.editor {
+  min-height: 80px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--field);
+  color: #fff;
+  font: 1rem/1.6 system-ui, sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+  cursor: text;
+}
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: #97859f;
+  pointer-events: none;
+}
+.editor .narration { color: #aaa4ae; font-style: italic; }
+.editor .dialogue { color: #ffa557; }
+.editor::selection, .editor *::selection { background: #795193; }
+.meta { justify-content: space-between; margin-top: 8px; }
+.issue { color: #ffb58e; font-size: .875rem; }
+.gap {
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.gap details { position: relative; z-index: 2; }
+.gap summary {
+  list-style: none;
+  cursor: pointer;
+  color: #ad8ac4;
+  padding: 0 28px;
+  border-radius: 8px;
+  line-height: 26px;
+}
+.gap summary::-webkit-details-marker { display: none; }
+.gap summary:hover { background: #2b1d37; color: #fff; }
+.gap .choices {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: #211829;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px #0008;
+  white-space: nowrap;
+}
+.more { position: relative; }
+.more summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.more .menu {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  z-index: 5;
+  min-width: 210px;
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  background: #211829;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px #0008;
+}
+.more .menu button { text-align: left; }
+.footer { justify-content: space-between; margin-top: 16px; }
+#status { min-height: 24px; color: var(--accent); }
+dialog {
+  width: min(800px, calc(100% - 24px));
+  max-height: 90vh;
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid #705385;
+  border-radius: 14px;
+  background: #19131f;
+  color: inherit;
+}
+dialog::backdrop { background: #000b; }
+dialog textarea { width: 100%; min-height: 260px; line-height: 1.5; resize: vertical; }
+dialog label { display: block; margin: 14px 0 6px; }
+dialog .checkbox { display: flex; gap: 8px; align-items: center; }
+#error { color: #ffb1bc; min-height: 24px; }
+#file { width: 100%; }
+#importMessages { max-height: 260px; overflow: auto; }
+#importMessages .checkbox { align-items: flex-start; overflow-wrap: anywhere; }
+#saveState { font-size: .875rem; color: var(--muted); }
+@media(max-width: 640px) {
+  main { padding: 22px 10px 70px; }
+  h1 { font-size: 2rem; }
+  .card { padding: 10px; }
+  .message-head .actions { margin-left: 0; }
+  .start-head input { flex-basis: 100%; order: 2; }
+  .editor { padding: 10px; }
+  .toolbar .spacer { display: none; }
+}
+@media(prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="muted">SillyTavern · Version 1.0</div>
+  <h1>ST-ExampleBuilder 1.0</h1>
+
+  <div class="toolbar">
+    <button id="openImport">Import chats</button>
+    <button id="formatAll">Format all narration</button>
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <span class="spacer"></span>
+    <span id="saveState" role="status" aria-live="polite">New draft — kept in memory only</span>
+  </div>
+
+  <div id="totalStats" class="stats"></div>
+  <div id="currentStats" class="stats"></div>
+
+  <div id="list" aria-label="Example conversations"></div>
+
+  <div class="footer">
+    <div class="actions">
+      <button id="clear">Clear all</button>
+      <button id="saveProject">Save project</button>
+    </div>
+    <div class="actions">
+      <button id="downloadText">Download .txt</button>
+      <button id="copyAll" class="primary">Copy all</button>
+    </div>
+  </div>
+
+  <p id="status" role="status" aria-live="polite"></p>
+  <p class="muted">
+    Click between rows to insert a message or START block.
+    Ctrl/Cmd + Enter adds the next message.
+    Example labels stay in saved projects and are excluded from chat exports.
+    Drafts stay in memory only and are lost when you close or reload this page.
+    Use Save project to keep a downloadable copy.
+  </p>
+</main>
+
+<dialog id="importDialog" aria-labelledby="importTitle">
+  <h2 id="importTitle">Import chats</h2>
+  <p class="muted">
+    Use {{user}}: and {{char}}: for messages.
+    Each &lt;START&gt; on its own line begins another example.
+    Without a START marker, the text becomes one example.
+    JSONL logs use is_user to assign speakers; chat metadata is excluded.
+  </p>
+
+  <label for="file">Load chat text, a SillyTavern JSONL log, or a saved project</label>
+  <input id="file" type="file" accept=".txt,.json,.jsonl,text/plain,application/json,application/x-ndjson">
+
+  <label for="importText">Formatted chat text</label>
+  <textarea id="importText" spellcheck="false"
+    placeholder="<START>
+{{user}}: Hello.
+{{char}}: Hi!
+
+<START>
+{{user}}: Another example.
+{{char}}: Another reply."></textarea>
+
+  <div id="importPreview" class="stats"></div>
+  <div id="importSelection" hidden>
+    <p class="muted">Choose messages from the JSONL log to use as examples.</p>
+    <div class="actions"><button id="selectAllMessages">Select all</button><button id="selectNoMessages">Select none</button></div>
+    <div id="importMessages"></div>
+  </div>
+
+  <label for="importMode">Import into</label>
+  <select id="importMode">
+    <option value="append">Append to current draft</option>
+    <option value="replace">Replace current draft</option>
+  </select>
+
+  <label class="checkbox">
+    <input id="formatImport" type="checkbox">
+    Format unmarked narration during import
+  </label>
+
+  <p id="error" role="alert"></p>
+  <div class="actions">
+    <button id="doImport" class="primary">Import</button>
+    <button id="cancelImport">Cancel</button>
+  </div>
+</dialog>
+
+<dialog id="copyDialog" aria-labelledby="copyTitle">
+  <h2 id="copyTitle">Copy text</h2>
+  <p class="muted">Automatic copying was unavailable. Copy the selected text manually.</p>
+  <textarea id="copyText" readonly></textarea>
+  <button id="closeCopy">Close</button>
+</dialog>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STORE = "st-example-builder-beta-1";
+const number = new Intl.NumberFormat();
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const uid = () => "b" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const clone = value => JSON.parse(JSON.stringify(value));
+
+const makeBlock = (type, text = "") => type === "start"
+  ? { id: uid(), type, label: "", collapsed: false }
+  : { id: uid(), type, text };
+
+let blocks = [makeBlock("start"), makeBlock("user")];
+let savedSnapshot = projectSnapshot();
+let hasDownloadedProject = false;
+let composingEditor = null;
+let jsonlSelection = null;
+let activeId = null;
+let lastCaret = null;
+let typingTimer;
+let statusTimer;
+let busy = false;
+
+function cleanBlocks(input) {
+  if (!Array.isArray(input)) throw Error("Invalid project blocks.");
+  return input.map(b => {
+    if (!b || !["start", "user", "char"].includes(b.type)) {
+      throw Error("Invalid block type.");
+    }
+    if (b.type === "start") return {
+      id: uid(), type: "start",
+      label: typeof b.label === "string" ? b.label : "",
+      collapsed: b.collapsed === true
+    };
+    if (typeof b.text !== "string") throw Error("Invalid message text.");
+    return { id: uid(), type: b.type, text: b.text };
+  });
+}
+
+// Remove drafts saved by older versions; never read or restore their contents.
+try { localStorage.removeItem(STORE); } catch { /* Storage may be disabled. */ }
+
+activeId = blocks[0]?.id;
+let history = [clone(blocks)];
+let historyIndex = 0;
+
+function notify(text) {
+  clearTimeout(statusTimer);
+  $("status").textContent = text;
+  statusTimer = setTimeout(() => $("status").textContent = "", 5000);
+}
+
+// IDs are internal; only project content determines whether the draft is saved.
+function projectSnapshot() {
+  return JSON.stringify(blocks.map(({ id, ...content }) => content));
+}
+
+function hasUnsavedChanges() {
+  return projectSnapshot() !== savedSnapshot;
+}
+
+function markUnsaved() {
+  $("saveState").textContent = hasUnsavedChanges()
+    ? "Unsaved changes — download a project to keep them"
+    : hasDownloadedProject
+      ? "Project downloaded — no changes since download"
+      : "New draft — kept in memory only";
+}
+
+function checkpoint() {
+  clearTimeout(typingTimer);
+  if (JSON.stringify(history[historyIndex]) !== JSON.stringify(blocks)) {
+    history = history.slice(0, historyIndex + 1);
+    history.push(clone(blocks));
+    if (history.length > 100) history.shift();
+    historyIndex = history.length - 1;
+  }
+  updateHistoryButtons();
+}
+
+function dirty() {
+  markUnsaved();
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(checkpoint, 650);
+  $("undo").disabled = false;
+  $("redo").disabled = true;
+}
+
+function updateHistoryButtons() {
+  $("undo").disabled = historyIndex === 0;
+  $("redo").disabled = historyIndex >= history.length - 1;
+}
+
+function change(fn, focusId = null) {
+  checkpoint();
+  fn();
+  checkpoint();
+  markUnsaved();
+  render(focusId);
+}
+
+function undoRedo(direction) {
+  checkpoint();
+  const next = historyIndex + direction;
+  if (next < 0 || next >= history.length) return;
+  historyIndex = next;
+  blocks = clone(history[historyIndex]);
+  markUnsaved();
+  render(activeId);
+  updateHistoryButtons();
+}
+
+function tokenize(text) {
+  const parts = [], issues = [];
+  let plain = "", i = 0;
+
+  const escaped = position => {
+    let n = 0;
+    while (position > 0 && text[--position] === "\\") n++;
+    return n % 2 === 1;
+  };
+
+  const flush = () => {
+    if (plain) parts.push({ type: "plain", text: plain });
+    plain = "";
+  };
+
+  while (i < text.length) {
+    const c = text[i];
+    if (!escaped(i) && (c === '"' || c === "“" || c === "*")) {
+      const type = c === "*" ? "action" : "quote";
+      const delimiter = c === "*" && text[i + 1] === "*" ? "**" : c;
+      const end = delimiter === "“" ? "”" : delimiter;
+      let j = i + delimiter.length;
+      while (
+        j < text.length &&
+        (text.slice(j, j + end.length) !== end || escaped(j))
+      ) j++;
+
+      if (j < text.length) {
+        flush();
+        parts.push({ type, text: text.slice(i, j + end.length) });
+        i = j + end.length;
+        continue;
+      }
+      issues.push(c === "*" ? "Unmatched asterisk" : "Unmatched quote");
+    }
+    plain += text[i++];
+  }
+
+  flush();
+  return { parts, issues: [...new Set(issues)] };
+}
+
+function narrate(text) {
+  const { parts, issues } = tokenize(text);
+  if (issues.length) return { text, issues };
+
+  return {
+    text: parts.map(p => p.type !== "plain" ? p.text :
+      p.text.split("\n").map(line => line.trim()
+        ? line.replace(/^(\s*)(.*?)(\s*)$/, "$1*$2*$3")
+        : line
+      ).join("\n")
+    ).join(""),
+    issues
+  };
+}
+
+function selectionOffsets(root) {
+  const selection = window.getSelection();
+  if (!selection.rangeCount ||
+      !root.contains(selection.anchorNode) ||
+      !root.contains(selection.focusNode)) return null;
+
+  function offset(node, position) {
+    const range = document.createRange();
+    range.selectNodeContents(root);
+    range.setEnd(node, position);
+    return range.toString().length;
+  }
+
+  return {
+    anchor: offset(selection.anchorNode, selection.anchorOffset),
+    focus: offset(selection.focusNode, selection.focusOffset)
+  };
+}
+
+function restoreSelection(root, offsets) {
+  if (!offsets) return;
+
+  function locate(position) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node, last = null;
+    while ((node = walker.nextNode())) {
+      last = node;
+      if (position <= node.length) return [node, position];
+      position -= node.length;
+    }
+    return last ? [last, last.length] : [root, 0];
+  }
+
+  const [a, ao] = locate(offsets.anchor);
+  const [f, fo] = locate(offsets.focus);
+  window.getSelection().setBaseAndExtent(a, ao, f, fo);
+}
+
+function paint(root, text, preserve = true) {
+  const offsets = preserve ? selectionOffsets(root) : null;
+  const fragment = document.createDocumentFragment();
+
+  for (const part of tokenize(text).parts) {
+    if (part.type === "plain") {
+      fragment.append(document.createTextNode(part.text));
+      continue;
+    }
+
+    const span = document.createElement("span");
+    span.className = part.type === "action" ? "narration" : "dialogue";
+
+    if (part.type === "action") {
+      let position = 0;
+      for (const match of part.text.matchAll(/"[^"]*"|“[^”]*”/g)) {
+        span.append(document.createTextNode(
+          part.text.slice(position, match.index)
+        ));
+        const quote = document.createElement("span");
+        quote.className = "dialogue";
+        quote.textContent = match[0];
+        span.append(quote);
+        position = match.index + match[0].length;
+      }
+      span.append(document.createTextNode(part.text.slice(position)));
+    } else {
+      span.textContent = part.text;
+    }
+
+    fragment.append(span);
+  }
+
+  // A terminal BR gives the cursor a real final empty line.
+  if (text.endsWith("\n")) fragment.append(document.createElement("br"));
+  root.replaceChildren(fragment);
+  restoreSelection(root, offsets);
+}
+
+function textStats(text) {
+  const chars = [...text].length;
+  const words = text.match(/\S+/gu)?.length || 0;
+  return { chars, words, tokens: Math.ceil(chars / 4) };
+}
+
+function statsLabel(text) {
+  const s = textStats(text);
+  return `${number.format(s.chars)} characters · ` +
+    `${number.format(s.words)} words · ≈${number.format(s.tokens)} tokens`;
+}
+
+function exportBlocks(items) {
+  let out = "";
+  for (const b of items) {
+    if (b.type === "start") {
+      out = out.replace(/\n+$/, "");
+      out += (out ? "\n\n" : "") + "<START>\n";
+    } else if (b.text.trim()) {
+      if (out && !out.endsWith("\n")) out += "\n";
+      out += `{{${b.type}}}: ${b.text}`;
+    }
+  }
+  return out.replace(/\n+$/, "");
+}
+
+function chatBounds(id) {
+  let index = blocks.findIndex(b => b.id === id);
+  if (index < 0) index = 0;
+  let start = index;
+  while (start > 0 && blocks[start].type !== "start") start--;
+  let end = index + 1;
+  while (end < blocks.length && blocks[end].type !== "start") end++;
+  return { start, end };
+}
+
+function updateStats() {
+  const messages = blocks.filter(b => b.type !== "start" && b.text.trim());
+  const text = messages.map(b => b.text).join("\n");
+  const s = textStats(text);
+  const totalTokens = Math.ceil([...exportBlocks(blocks)].length / 4);
+
+  $("totalStats").textContent =
+    `Whole draft: ${messages.length} messages · ` +
+    `${number.format(s.chars)} characters · ${number.format(s.words)} words · ` +
+    `≈${number.format(totalTokens)} tokens`;
+
+  if (blocks.length) {
+    const { start, end } = chatBounds(activeId);
+    const current = blocks.slice(start, end);
+    const title = current[0]?.type === "start"
+      ? current[0].label || "Untitled example"
+      : "Example without START";
+    const selected = current.filter(b => b.type !== "start" && b.text.trim());
+    const counts = textStats(selected.map(b => b.text).join("\n"));
+    $("currentStats").textContent =
+      `${title}: ${selected.length} messages · ` +
+      `${number.format(counts.chars)} characters · ` +
+      `${number.format(counts.words)} words · ` +
+      `≈${number.format(Math.ceil([...exportBlocks(current)].length / 4))} tokens`;
+  } else {
+    $("currentStats").textContent = "";
+  }
+
+  $("copyAll").disabled = !messages.length;
+  $("downloadText").disabled = !messages.length;
+}
+
+function updateMessageMeta(id) {
+  const b = blocks.find(b => b.id === id);
+  const row = document.querySelector(`[data-id="${id}"]`);
+  if (!b || b.type === "start" || !row) return;
+  row.querySelector(".message-stats").textContent = statsLabel(b.text);
+  row.querySelector(".issue").textContent = tokenize(b.text).issues.join(" · ");
+}
+
+function button(text, action, id, title = text) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = text;
+  b.dataset.action = action;
+  if (id) b.dataset.id = id;
+  b.title = title;
+  b.setAttribute("aria-label", title);
+  return b;
+}
+
+function gap(index) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "gap";
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "+";
+  summary.setAttribute("aria-label", "Insert a block here");
+  const choices = document.createElement("div");
+  choices.className = "choices";
+  for (const [type, label] of [
+    ["user", "User"], ["char", "Character"], ["start", "START"]
+  ]) {
+    const b = button(label, "insert");
+    b.dataset.index = index;
+    b.dataset.type = type;
+    choices.append(b);
+  }
+  details.append(summary, choices);
+  wrapper.append(details);
+  return wrapper;
+}
+
+function editorFor(b) {
+  const editor = document.createElement("div");
+  editor.className = "editor";
+  editor.contentEditable = "plaintext-only";
+  editor.spellcheck = false;
+  editor.dataset.editor = b.id;
+  editor.dataset.placeholder = "Write an example message…";
+  editor.setAttribute("role", "textbox");
+  editor.setAttribute("aria-multiline", "true");
+  editor.setAttribute("aria-label", `${b.type} message`);
+  paint(editor, b.text, false);
+  return editor;
+}
+
+function render(focusId = null) {
+  const positions = new Map(
+    [...$("list").querySelectorAll(".card")].map(el =>
+      [el.dataset.id, el.getBoundingClientRect()]
+    )
+  );
+
+  const fragment = document.createDocumentFragment();
+  let hidden = false;
+
+  blocks.forEach((b, index) => {
+    if (b.type === "start") hidden = false;
+    if (hidden) return;
+
+    fragment.append(gap(index));
+    const row = document.createElement("section");
+    row.className = "card" + (b.type === "start" ? " start" : "");
+    row.dataset.id = b.id;
+
+    if (b.type === "start") {
+      const head = document.createElement("div");
+      head.className = "start-head";
+      head.append(button(b.collapsed ? "▸" : "▾", "collapse", b.id,
+        b.collapsed ? "Expand example" : "Collapse example"));
+      const marker = document.createElement("code");
+      marker.textContent = "<START>";
+      const label = document.createElement("input");
+      label.value = b.label;
+      label.placeholder = "Example label — not exported";
+      label.dataset.label = b.id;
+      label.setAttribute("aria-label", "Example label, not exported");
+      head.append(marker, label,
+        button("Copy chat", "copyChat", b.id),
+        button("×", "remove", b.id, "Remove START block (joins neighboring examples)"));
+      row.append(head);
+      if (b.collapsed) {
+        const { end } = chatBounds(b.id);
+        const info = document.createElement("div");
+        info.className = "stats";
+        info.textContent = `${end - index - 1} message rows hidden`;
+        row.append(info);
+        hidden = true;
+      }
+    } else {
+      const head = document.createElement("div");
+      head.className = "message-head";
+
+      const speaker = document.createElement("select");
+      speaker.dataset.speaker = b.id;
+      speaker.setAttribute("aria-label", "Speaker");
+      ["user", "char"].forEach(type => {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = `{{${type}}}:`;
+        speaker.append(option);
+      });
+      speaker.value = b.type;
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.append(button("Format narration", "format", b.id));
+
+      const more = document.createElement("details");
+      more.className = "more";
+      const summary = document.createElement("summary");
+      summary.textContent = "•••";
+      summary.setAttribute("aria-label", "Message actions");
+      const menu = document.createElement("div");
+      menu.className = "menu";
+      menu.append(
+        button("Split at last cursor position", "split", b.id),
+        button("Merge with previous message", "merge", b.id),
+        button("Move up", "up", b.id),
+        button("Move down", "down", b.id)
+      );
+      more.append(summary, menu);
+      actions.append(more, button("×", "remove", b.id, "Remove message"));
+      head.append(speaker, actions);
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const stats = document.createElement("span");
+      stats.className = "stats message-stats";
+      stats.textContent = statsLabel(b.text);
+      stats.title = "Tokens estimated from characters ÷ 4; tokenizer counts vary.";
+      const issue = document.createElement("span");
+      issue.className = "issue";
+      issue.textContent = tokenize(b.text).issues.join(" · ");
+      meta.append(stats, issue);
+      row.append(head, editorFor(b), meta);
+    }
+
+    fragment.append(row);
+  });
+
+  fragment.append(gap(blocks.length));
+  $("list").replaceChildren(fragment);
+
+  if (focusId) activeId = focusId;
+  if (!blocks.some(b => b.id === activeId)) activeId = blocks[0]?.id;
+  markActive();
+  updateStats();
+  updateHistoryButtons();
+
+  if (!reduceMotion.matches) {
+    $("list").querySelectorAll(".card").forEach(row => {
+      const before = positions.get(row.dataset.id);
+      const after = row.getBoundingClientRect();
+      if (before) {
+        const offset = before.top - after.top;
+        if (Math.abs(offset) > 1) row.animate(
+          [{ transform: `translateY(${offset}px)` }, { transform: "translateY(0)" }],
+          { duration: 180, easing: "ease-out" }
+        );
+      } else {
+        row.animate(
+          [{ opacity: 0, transform: "translateY(-6px)" },
+           { opacity: 1, transform: "translateY(0)" }],
+          { duration: 180, easing: "ease-out" }
+        );
+      }
+    });
+  }
+
+  if (focusId) {
+    const row = document.querySelector(`[data-id="${focusId}"]`);
+    const field = row?.querySelector(".editor, input");
+    field?.focus({ preventScroll: true });
+    row?.scrollIntoView({
+      block: "nearest",
+      behavior: reduceMotion.matches ? "auto" : "smooth"
+    });
+  }
+}
+
+function markActive() {
+  const { start, end } = chatBounds(activeId);
+  const ids = new Set(blocks.slice(start, end).map(b => b.id));
+  $("list").querySelectorAll(".card").forEach(row =>
+    row.classList.toggle("active", ids.has(row.dataset.id))
+  );
+}
+
+function captureCaret(editor) {
+  const offsets = selectionOffsets(editor);
+  if (offsets) lastCaret = { id: editor.dataset.editor, ...offsets };
+}
+
+function commitEditor(editor, composing = false) {
+  const b = blocks.find(b => b.id === editor.dataset.editor);
+  if (!b) return;
+  b.text = editor.textContent.replace(/\r\n?/g, "\n");
+  if (!composing && composingEditor !== editor) paint(editor, b.text);
+  captureCaret(editor);
+  dirty();
+  updateMessageMeta(b.id);
+  updateStats();
+}
+
+function insertText(editor, text) {
+  const selection = window.getSelection();
+  if (!selection.rangeCount || (!editor.contains(selection.anchorNode) || !editor.contains(selection.focusNode))) {
+    editor.focus();
+    restoreSelection(editor, {
+      anchor: editor.textContent.length, focus: editor.textContent.length
+    });
+  }
+  const range = window.getSelection().getRangeAt(0);
+  range.deleteContents();
+  const node = document.createTextNode(text);
+  range.insertNode(node);
+  range.setStartAfter(node);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  commitEditor(editor);
+}
+
+$("list").addEventListener("input", event => {
+  if (event.target.matches("[data-label]")) {
+    const b = blocks.find(b => b.id === event.target.dataset.label);
+    b.label = event.target.value;
+    dirty();
+    updateStats();
+  } else if (event.target.closest(".editor")) {
+    commitEditor(event.target.closest(".editor"), event.isComposing);
+  }
+});
+
+$("list").addEventListener("compositionstart", event => {
+  composingEditor = event.target.closest(".editor");
+});
+
+$("list").addEventListener("compositionend", event => {
+  const editor = event.target.closest(".editor");
+  composingEditor = null;
+  // Let the browser deliver its final composition input before repainting.
+  if (editor) queueMicrotask(() => {
+    if (editor.isConnected && composingEditor !== editor) commitEditor(editor);
+  });
+});
+
+$("list").addEventListener("beforeinput", event => {
+  if (!event.target.closest(".editor") || event.isComposing || composingEditor) return;
+  if (["insertParagraph", "insertLineBreak"].includes(event.inputType)) {
+    event.preventDefault();
+    insertText(event.target.closest(".editor"), "\n");
+  } else if (event.inputType === "historyUndo" ||
+             event.inputType === "historyRedo") {
+    event.preventDefault();
+    undoRedo(event.inputType === "historyUndo" ? -1 : 1);
+  }
+});
+
+$("list").addEventListener("paste", event => {
+  if (!event.target.closest(".editor")) return;
+  event.preventDefault();
+  insertText(event.target.closest(".editor"),
+    event.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n"));
+});
+
+$("list").addEventListener("drop", event => {
+  if (!event.target.closest(".editor")) return;
+  event.preventDefault();
+  notify("Paste text with Ctrl/Cmd + V.");
+});
+
+$("list").addEventListener("focusin", event => {
+  const row = event.target.closest(".card");
+  if (!row) return;
+  activeId = row.dataset.id;
+  markActive();
+  updateStats();
+});
+
+document.addEventListener("selectionchange", () => {
+  const editor = document.activeElement;
+  if (editor?.matches(".editor")) captureCaret(editor);
+});
+
+$("list").addEventListener("change", event => {
+  if (!event.target.matches("[data-speaker]")) return;
+  const b = blocks.find(b => b.id === event.target.dataset.speaker);
+  change(() => b.type = event.target.value);
+});
+
+$("list").addEventListener("keydown", event => {
+  const editor = event.target.closest(".editor");
+  if (!editor || event.isComposing || composingEditor || event.keyCode === 229) return;
+  if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+    event.preventDefault();
+    const i = blocks.findIndex(b => b.id === editor.dataset.editor);
+    const next = makeBlock(blocks[i].type === "user" ? "char" : "user");
+    change(() => blocks.splice(i + 1, 0, next), next.id);
+  } else if (event.key === "Enter" && !event.isComposing) {
+    event.preventDefault();
+    insertText(editor, "\n");
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if ($("importDialog").open || $("copyDialog").open || event.isComposing || composingEditor) return;
+  if (!(event.ctrlKey || event.metaKey)) return;
+  const key = event.key.toLowerCase();
+  if (key === "z" || key === "y") {
+    event.preventDefault();
+    undoRedo(key === "y" || event.shiftKey ? 1 : -1);
+  }
+});
+
+async function removeBlock(id) {
+  if (busy) return;
+  const index = blocks.findIndex(b => b.id === id);
+  if (blocks[index]?.type === "start" && index > 0 &&
+      !confirm("Remove this START block? Its messages will join the preceding example.")) return;
+  busy = true;
+  try {
+  const row = document.querySelector(`[data-id="${id}"]`);
+  if (row && !reduceMotion.matches) {
+    const height = row.getBoundingClientRect().height;
+    await row.animate([
+      { opacity: 1, height: height + "px", padding: "14px" },
+      { opacity: 0, height: "0px", padding: "0px" }
+    ], { duration: 170, easing: "ease-in", fill: "forwards" }).finished;
+  }
+  change(() => blocks = blocks.filter(b => b.id !== id));
+  } finally { busy = false; }
+}
+
+$("list").addEventListener("click", async event => {
+  const target = event.target.closest("button[data-action]");
+  if (!target || busy) return;
+  const action = target.dataset.action;
+  const id = target.dataset.id;
+  const i = blocks.findIndex(b => b.id === id);
+  const b = blocks[i];
+
+  if (action === "insert") {
+    const next = makeBlock(target.dataset.type);
+    change(() => blocks.splice(Number(target.dataset.index), 0, next), next.id);
+  } else if (action === "remove") {
+    await removeBlock(id);
+  } else if (action === "collapse") {
+    change(() => b.collapsed = !b.collapsed);
+  } else if (action === "copyChat") {
+    const { start, end } = chatBounds(id);
+    await copyText(exportBlocks(blocks.slice(start, end)));
+  } else if (action === "format") {
+    const result = narrate(b.text);
+    if (result.issues.length) {
+      notify("Fix unmatched quotes or asterisks first; this message was left unchanged.");
+    } else if (result.text !== b.text) {
+      change(() => b.text = result.text);
+    } else notify("Narration is already formatted.");
+  } else if (action === "up" && i > 0) {
+    if (blocks[i - 1].type === "start" &&
+        !confirm("Move this message above START? It will leave its current example.")) return;
+    change(() => [blocks[i - 1], blocks[i]] = [blocks[i], blocks[i - 1]], id);
+  } else if (action === "down" && i < blocks.length - 1) {
+    if (blocks[i + 1].type === "start" &&
+        !confirm("Move this message below START? It will join the next example.")) return;
+    change(() => [blocks[i + 1], blocks[i]] = [blocks[i], blocks[i + 1]], id);
+  } else if (action === "split") {
+    if (lastCaret?.id !== id) {
+      notify("Place the cursor where you want to split this message first.");
+      return;
+    }
+    const position = Math.min(lastCaret.focus, b.text.length);
+    if (position === 0 || position === b.text.length) {
+      notify("Place the cursor inside the message.");
+      return;
+    }
+    const next = makeBlock(b.type, b.text.slice(position));
+    change(() => {
+      b.text = b.text.slice(0, position);
+      blocks.splice(i + 1, 0, next);
+    }, next.id);
+  } else if (action === "merge") {
+    const previous = blocks[i - 1];
+    if (!previous || previous.type === "start") {
+      notify("There is no previous message in this example.");
+      return;
+    }
+    if (previous.type !== b.type &&
+        !confirm("These messages have different speakers. Keep the previous speaker and merge?")) {
+      return;
+    }
+    change(() => {
+      previous.text += (previous.text && b.text ? "\n\n" : "") + b.text;
+      blocks.splice(i, 1);
+    }, previous.id);
+  }
+});
+
+function formatCollection(items) {
+  let changed = 0, skipped = 0;
+  for (const b of items) {
+    if (b.type === "start") continue;
+    const result = narrate(b.text);
+    if (result.issues.length) skipped++;
+    else if (result.text !== b.text) {
+      b.text = result.text;
+      changed++;
+    }
+  }
+  return { changed, skipped };
+}
+
+$("formatAll").onclick = () => {
+  let result;
+  change(() => result = formatCollection(blocks));
+  notify(`${result.changed} messages formatted. ${result.skipped} with unmatched markers skipped. Undo reverses the operation.`);
+};
+
+function parseChat(raw) {
+  const result = [];
+  let msg = null;
+  const finish = () => {
+    if (!msg) return;
+    msg.text = msg.lines.join("\n").replace(/\n+$/, "");
+    delete msg.lines;
+    result.push(msg);
+    msg = null;
+  };
+
+  raw.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n")
+    .split("\n").forEach((line, i) => {
+      if (/^\s*<START>\s*$/i.test(line)) {
+        finish();
+        result.push(makeBlock("start"));
+        return;
+      }
+      const m = line.match(/^\s*\{\{(user|char)\}\}:[ \t]?(.*)$/i);
+      if (m) {
+        finish();
+        if (!result.length) result.push(makeBlock("start"));
+        msg = { ...makeBlock(m[1].toLowerCase()), lines: [m[2]] };
+      } else if (msg) {
+        msg.lines.push(line);
+      } else if (line.trim()) {
+        throw importLineError(i + 1, "Expected {{user}}: message, {{char}}: message, or <START> on its own line.");
+      }
+    });
+
+  finish();
+  if (!result.some(b => b.type !== "start")) throw Error("No messages found.");
+  return result;
+}
+
+function importLineError(line, message) {
+  const error = Error(`Line ${line}: ${message}`);
+  error.line = line;
+  return error;
+}
+
+function highlightImportError(error) {
+  if (!error.line) return;
+  const field = $("importText");
+  const lines = field.value.split("\n");
+  const start = lines.slice(0, error.line - 1).reduce((n, line) => n + line.length + 1, 0);
+  field.focus();
+  field.setSelectionRange(start, start + (lines[error.line - 1]?.length || 0));
+}
+
+function isJsonl(raw) {
+  const lines = raw.trim().split(/\r?\n/).filter(line => line.trim());
+  if (!lines.length || !lines[0].trim().startsWith("{")) return false;
+  try {
+    const first = JSON.parse(lines[0]);
+    return typeof first.is_user === "boolean" || "chat_metadata" in first || "user_name" in first;
+  } catch { return false; }
+}
+
+function parseJsonl(raw) {
+  const messages = [];
+  raw.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((line, index) => {
+    if (!line.trim()) return;
+    let entry;
+    try { entry = JSON.parse(line); }
+    catch { throw importLineError(index + 1, "Invalid JSONL. Each line must be a complete JSON object."); }
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      throw importLineError(index + 1, "Expected a JSONL message object.");
+    }
+    if (index === 0 && !("mes" in entry) &&
+        ("chat_metadata" in entry || "user_name" in entry)) return;
+    // System messages are not example dialogue. Names, dates and extra metadata are discarded.
+    if (entry.is_system === true) return;
+    if (typeof entry.is_user !== "boolean" || typeof entry.mes !== "string") {
+      throw importLineError(index + 1, "Expected is_user (boolean) and mes (text).");
+    }
+    messages.push(makeBlock(entry.is_user ? "user" : "char", entry.mes.replace(/\r\n?/g, "\n")));
+  });
+  if (!messages.length) throw Error("No dialogue messages found in the JSONL log.");
+  return [makeBlock("start"), ...messages];
+}
+
+function readImport() {
+  const raw = $("importText").value;
+  const trimmed = raw.trim();
+  if (isJsonl(raw)) {
+    const parsed = parseJsonl(raw);
+    if (jsonlSelection) return parsed.filter((b, index) => index === 0 || jsonlSelection.has(index - 1));
+    return parsed;
+  }
+  if (trimmed.startsWith("{")) {
+    try {
+      const project = JSON.parse(trimmed);
+      if (project.app === "ST Example Builder") {
+        if (!["1.0", "1.0-beta"].includes(project.version)) throw Error("Unsupported project version.");
+        return cleanBlocks(project.blocks);
+      }
+      throw Error("Not an ST Example Builder project. Import a saved project or a SillyTavern JSONL log.");
+    } catch (error) {
+      if (!trimmed.startsWith("{{")) throw Error("Invalid project JSON: " + error.message);
+    }
+  }
+  return parseChat(raw);
+}
+
+function previewImport() {
+  $("error").textContent = "";
+  if (!$("importText").value.trim()) {
+    $("importPreview").textContent = "";
+    return;
+  }
+  try {
+    const parsed = readImport();
+    const starts = parsed.filter(b => b.type === "start").length;
+    const messages = parsed.filter(b => b.type !== "start").length;
+    $("importPreview").textContent = `${starts} START blocks · ${messages} messages`;
+  } catch (error) {
+    $("importPreview").textContent = error.message;
+  }
+}
+
+$("openImport").onclick = () => {
+  $("error").textContent = "";
+  $("importDialog").showModal();
+  $("importText").focus();
+};
+
+$("cancelImport").onclick = () => $("importDialog").close();
+function refreshImport() {
+  jsonlSelection = null;
+  $("importMessages").replaceChildren();
+  $("importSelection").hidden = true;
+  if (isJsonl($("importText").value)) {
+    try {
+      const messages = parseJsonl($("importText").value).slice(1);
+      jsonlSelection = new Set(messages.map((_, index) => index));
+      for (const [index, message] of messages.entries()) {
+        const label = document.createElement("label");
+        label.className = "checkbox";
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = true;
+        check.dataset.messageIndex = index;
+        const text = document.createElement("span");
+        text.textContent = `{{${message.type}}}: ${message.text.slice(0, 180)}` + (message.text.length > 180 ? "…" : "");
+        label.append(check, text);
+        $("importMessages").append(label);
+      }
+      $("importSelection").hidden = false;
+    } catch { /* previewImport displays the parse error. */ }
+  }
+  previewImport();
+}
+
+$("importText").addEventListener("input", refreshImport);
+$("importMessages").addEventListener("change", event => {
+  const index = Number(event.target.dataset.messageIndex);
+  if (event.target.checked) jsonlSelection.add(index);
+  else jsonlSelection.delete(index);
+  previewImport();
+});
+for (const [id, selected] of [["selectAllMessages", true], ["selectNoMessages", false]]) {
+  $(id).onclick = () => {
+    $("importMessages").querySelectorAll("input").forEach(check => {
+      check.checked = selected;
+      const index = Number(check.dataset.messageIndex);
+      if (selected) jsonlSelection.add(index);
+      else jsonlSelection.delete(index);
+    });
+    previewImport();
+  };
+}
+
+$("file").onchange = async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    $("importText").value = await file.text();
+    refreshImport();
+  } catch {
+    $("error").textContent = "Could not read the file.";
+  }
+  event.target.value = "";
+};
+
+$("doImport").onclick = () => {
+  try {
+    const parsed = readImport();
+    if (isJsonl($("importText").value) && parsed.length < 2) throw Error("Select at least one message to import.");
+    let formatted = null;
+    if ($("formatImport").checked) formatted = formatCollection(parsed);
+    const replace = $("importMode").value === "replace";
+    const hasContent = blocks.some(b =>
+      b.type === "start" ? b.label.trim() : b.text.trim()
+    );
+    if (replace && hasContent && !confirm("Replace the current draft?")) return;
+
+    $("importDialog").close();
+    change(() => {
+      blocks = replace || !hasContent ? parsed : [...blocks, ...parsed];
+      activeId = parsed[0]?.id;
+    });
+    $("importText").value = "";
+    previewImport();
+    notify("Import complete." + (formatted?.skipped
+      ? ` ${formatted.skipped} messages with unmatched markers were not reformatted.`
+      : ""));
+  } catch (error) {
+    $("error").textContent = error.message;
+    highlightImportError(error);
+  }
+};
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    notify("Copied.");
+  } catch {
+    $("copyText").value = text;
+    $("copyDialog").showModal();
+    $("copyText").focus();
+    $("copyText").select();
+  }
+}
+
+function download(filename, text, type) {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+$("copyAll").onclick = () => copyText(exportBlocks(blocks));
+$("closeCopy").onclick = () => $("copyDialog").close();
+
+$("downloadText").onclick = () =>
+  download("ST-examples.txt", exportBlocks(blocks), "text/plain;charset=utf-8");
+
+$("saveProject").onclick = () => {
+  checkpoint();
+  download("ST-examples-project.json", JSON.stringify({
+    app: "ST Example Builder",
+    version: "1.0",
+    blocks
+  }, null, 2), "application/json");
+  savedSnapshot = projectSnapshot();
+  hasDownloadedProject = true;
+  markUnsaved();
+  notify("Project download requested. Check your browser downloads for the file.");
+};
+
+$("clear").onclick = () => {
+  if (!confirm("Clear the draft? You can undo this.")) return;
+  change(() => {
+    blocks = [makeBlock("start"), makeBlock("user")];
+    activeId = blocks[0].id;
+  });
+};
+
+$("undo").onclick = () => undoRedo(-1);
+$("redo").onclick = () => undoRedo(1);
+
+window.addEventListener("beforeunload", event => {
+  if (!hasUnsavedChanges()) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
+// Release temporary clipboard and import text when their dialogs close.
+$("copyDialog").addEventListener("close", () => $("copyText").value = "");
+$("importDialog").addEventListener("close", () => {
+  $("importText").value = "";
+  $("file").value = "";
+  refreshImport();
+});
+
+render();
+
+</script>
+</body>
+</html>
