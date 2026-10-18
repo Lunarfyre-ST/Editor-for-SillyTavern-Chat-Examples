@@ -39,7 +39,12 @@ When accessed online, GitHub Pages still receives normal hosting requests; use t
 
 ## GitHub Pages setup
 
-In the repository's **Settings → Pages**, choose **Deploy from a branch**, select your published branch and **/(root)**, and save. The root `index.html` opens the application. The app link above becomes available after GitHub finishes deployment.
+1. Commit and push the project, including `.github/workflows/pages.yml`, to `main`.
+2. In the repository's **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
+3. Open **Actions → Deploy Example Builder to Pages**. If a deployment has not started, click **Run workflow**, select `main`, and run it. If an earlier run failed before you changed the source, run it again.
+4. When the deployment succeeds, open the app link above. The root `index.html` opens the application.
+
+The workflow publishes only `index.html` and `ST-ExampleBuilder-1.0.html`. It runs on pushes to `main` and can also be started manually. If deployment fails, open the failed step in that named workflow to see the error.
 
 ## Development tests
 
