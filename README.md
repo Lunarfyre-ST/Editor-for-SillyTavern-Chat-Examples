@@ -2,9 +2,9 @@
 
 A standalone HTML editor for SillyTavern example conversations. Import, edit, and export messages using `{{user}}:`, `{{char}}:`, and `<START>` markers.
 
-![Example Builder preview](docs/preview-1.0.png)
-
 ## [Open the app on GitHub Pages](https://lunarfyre-st.github.io/Editor-for-SillyTavern-Chat-Examples/)
+
+![Example Builder preview](docs/preview-1.0.png)
 
 You can also download `ST-ExampleBuilder-1.0.html` and open it directly in a modern browser; no installation or server is required.
 
