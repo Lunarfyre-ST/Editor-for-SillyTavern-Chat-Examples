@@ -29,10 +29,6 @@ Begin each message with `{{user}}:` or `{{char}}:`. Put `<START>` on its own lin
 
 Token counts are estimates. SillyTavern JSONL logs can be imported too: choose the messages to keep, then import them as an example. System messages and log metadata are excluded.
 
-## 🎭 ImmersiveGroups
-
-Want to give your SillyTavern chats a visual novel feel? Check out [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
-
 ## Privacy and saving
 
 Chat text and labels stay in the page's memory. The app has no analytics, external dependencies, network requests, cookies, or automatic draft storage. It removes the draft storage key used by older versions on startup, without restoring its contents.
@@ -40,3 +36,8 @@ Chat text and labels stay in the page's memory. The app has no analytics, extern
 Closing or reloading the page loses the draft, so download a project before leaving. Exported files and text copied to your clipboard can contain personal information you entered; manage those copies yourself.
 
 When accessed online, GitHub Pages still receives normal hosting requests; use the downloaded HTML offline if you prefer. Browser extensions, browser recovery features, and the operating system are outside the app's control.
+
+
+## 🎭 ImmersiveGroups
+
+Want to give your SillyTavern chats a visual novel feel? Check out my extension, [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
