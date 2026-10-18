@@ -29,6 +29,8 @@ Begin each message with `{{user}}:` or `{{char}}:`. Put `<START>` on its own lin
 
 Token counts are estimates. SillyTavern JSONL logs can be imported too: choose the messages to keep, then import them as an example. System messages and log metadata are excluded.
 
+🎭 Want to give your SillyTavern chats a visual novel feel? Check out [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library gallery](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
+
 ## Privacy and saving
 
 Chat text and labels stay in the page's memory. The app has no analytics, external dependencies, network requests, cookies, or automatic draft storage. It removes the draft storage key used by older versions on startup, without restoring its contents.
@@ -36,18 +38,3 @@ Chat text and labels stay in the page's memory. The app has no analytics, extern
 Closing or reloading the page loses the draft, so download a project before leaving. Exported files and text copied to your clipboard can contain personal information you entered; manage those copies yourself.
 
 When accessed online, GitHub Pages still receives normal hosting requests; use the downloaded HTML offline if you prefer. Browser extensions, browser recovery features, and the operating system are outside the app's control.
-
-## GitHub Pages setup
-
-1. Commit and push the project, including `.github/workflows/pages.yml`, to `main`.
-2. In the repository's **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
-3. Open **Actions → Deploy Example Builder to Pages**. If a deployment has not started, click **Run workflow**, select `main`, and run it. If an earlier run failed before you changed the source, run it again.
-4. When the deployment succeeds, open the app link above. The root `index.html` opens the application.
-
-The workflow publishes only `index.html` and `ST-ExampleBuilder-1.0.html`. It runs on pushes to `main` and can also be started manually. If deployment fails, open the failed step in that named workflow to see the error.
-
-## Development tests
-
-Use Node.js 20 or later and an installed Google Chrome, then run `npm install` and `npm test`. Tests run headlessly with Playwright and cover saving, undo/redo, text editing, composition events, imports, example boundaries, privacy, and mobile layout. Set `BROWSER_CHANNEL=msedge` to run against Microsoft Edge instead. Set `UPDATE_PREVIEW=1` to regenerate the README preview with sample dialogue.
-
-Composition and mobile checks simulate browser events and screen sizes; they do not replace testing with a physical phone or an actual IME keyboard.
