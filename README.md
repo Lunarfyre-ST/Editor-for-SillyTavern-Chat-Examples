@@ -38,6 +38,6 @@ Closing or reloading the page loses the draft, so download a project before leav
 When accessed online, GitHub Pages still receives normal hosting requests; use the downloaded HTML offline if you prefer. Browser extensions, browser recovery features, and the operating system are outside the app's control.
 
 
-## 🎭 ImmersiveGroups [EXPERIMENTAL]
+## 🎭 ImmersiveGroups
 
 Want to give your SillyTavern chats a visual novel feel? Check out my extension, [ImmersiveGroups](https://github.com/Lunarfyre-ST/ImmersiveGroups) for character sprites, outfit changes, and backgrounds, and browse the [ImmersiveGroups Library](https://github.com/Lunarfyre-ST/ImmersiveGroups-Library) for character sets and assets.
